@@ -10,63 +10,63 @@ enum Color {
 
 abstract class Tree {
     private int value;
-    
+
     private Color color;
-    
+
     private int depth;
-    
-	public Tree(int value, Color color, int depth) {
-		this.value = value;
-		this.color = color;
-		this.depth = depth;
-    }
-    
-	public int getValue() {
-		return value;
-    }
-    
-	public Color getColor() {
-		return color;
-    }
-    
-	public int getDepth() {
-		return depth;
-    }
-    
-	public abstract void accept(TreeVis visitor);
+
+    public Tree(int value, Color color, int depth) {
+	this.value = value;
+	this.color = color;
+	this.depth = depth;
+   }
+
+   public int getValue() {
+	return value;
+   }
+
+   public Color getColor() {
+       return color;
+   }
+
+   public int getDepth() {
+       return depth;
+   }
+
+   public abstract void accept(TreeVis visitor);
 }
 
 class TreeNode extends Tree {
     private ArrayList<Tree> children = new ArrayList<>();
     
-	public TreeNode(int value, Color color, int depth) {
-		super(value, color, depth);
+    public TreeNode(int value, Color color, int depth) {
+	super(value, color, depth);
     }
     
-	public void accept(TreeVis visitor) {
-		visitor.visitNode(this);
-		for (Tree child : children) {
-			child.accept(visitor);
-		}
-	}
-	public void addChild(Tree child) {
-		children.add(child);
-	}
+    public void accept(TreeVis visitor) {
+        visitor.visitNode(this);
+        for (Tree child : children) {
+	    child.accept(visitor);
+        }
+    }
+    public void addChild(Tree child) {
+       children.add(child);
+    }
 }
 
 class TreeLeaf extends Tree {
-	public TreeLeaf(int value, Color color, int depth) {
-		super(value, color, depth);
-	}
-	public void accept(TreeVis visitor) {
-		visitor.visitLeaf(this);
-	}
+    public TreeLeaf(int value, Color color, int depth) {
+	super(value, color, depth);
+    }
+    public void accept(TreeVis visitor) {
+	visitor.visitLeaf(this);
+    }
 }
 
 abstract class TreeVis {
-	public abstract int getResult();
-	public abstract void visitNode(TreeNode node);
-	public abstract void visitLeaf(TreeLeaf leaf);
+   public abstract int getResult();
+   public abstract void visitNode(TreeNode node);
+   public abstract void visitLeaf(TreeLeaf leaf);
 }
 
 /* ---------- */
@@ -74,16 +74,15 @@ abstract class TreeVis {
 class SumInLeavesVisitor extends TreeVis{
     int result=0;
     
-	public int getResult(){
-		return result;
+    public int getResult(){
+	return result;
     }
     
-	public void visitNode(TreeNode node){
+    public void visitNode(TreeNode node){}
+   
+    public void visitLeaf(TreeLeaf leaf){
+	result+=leaf.getValue();
     }
-    
-	public void visitLeaf(TreeLeaf leaf){
-		result+=leaf.getValue();
-	}
 }
 
 class ProductOfRedNodesVisitor extends TreeVis {
@@ -109,25 +108,22 @@ class ProductOfRedNodesVisitor extends TreeVis {
 
 class FancyVisitor extends TreeVis{
 	private int nonLeafNodesEvenDepth = 0;
+   
+   	private int greenLeafNodes = 0;
     
-    private int greenLeafNodes = 0;
+	public int getResult() {
+	  return Math.abs(nonLeafNodesEvenDepth - greenLeafNodes);
+    	}
     
-	public int getResult(){
-
-		return Math.abs(nonLeafNodesEvenDepth - greenLeafNodes);
-    }
-    
-	public void visitNode(TreeNode node){
-
-		if(node.getDepth() %2 == 0){
-
-			nonLeafNodesEvenDepth+=node.getValue();
-		}
+	public void visitNode(TreeNode node) {
+	  if(node.getDepth() %2 == 0){
+	     nonLeafNodesEvenDepth+=node.getValue();
+	  }
 	}
-	public void visitLeaf(TreeLeaf leaf){
-		if(leaf.getColor() == Color.GREEN){
-			greenLeafNodes+=leaf.getValue();
-		}
+	public void visitLeaf(TreeLeaf leaf) {
+	  if(leaf.getColor() == Color.GREEN) {
+		greenLeafNodes+=leaf.getValue();
+	   }
 	}
 }
 
@@ -156,39 +152,37 @@ class Solution{
         
         Tree rootNode;
         
-		if(readNodes==1){
-			rootNode=new TreeLeaf(inputValues[0],colors[0],0);
-		}else{
-            rootNode=new TreeNode(inputValues[0],colors[0],0);
+	if(readNodes==1){
+	  rootNode=new TreeLeaf(inputValues[0],colors[0],0);
+	}else{
+          rootNode=new TreeNode(inputValues[0],colors[0],0);
             
-			for(int i=0;i<(readNodes-1);i++) {
+	for(int i=0;i<(readNodes-1);i++) {
 
-                int u = in.nextInt();
-                
-                int v = in.nextInt();
-                
-                Set<Integer> uEdges = nodes.get(u);
-                
-                if(uEdges==null)uEdges = new HashSet<>();
-                
-                uEdges.add(v);
-                
-                nodes.put(u, uEdges);
-                
-                Set<Integer> vEdges = nodes.get(v);
-                
-                if(vEdges==null)vEdges = new HashSet<>();
-                
-                vEdges.add(u);
-                
-				nodes.put(v, vEdges);
-			}
-			for(int nodeid:nodes.get(1)){
-				nodes.get(nodeid).remove(1);
-				createEdge(rootNode, nodeid);
-			}
-		}
-		return rootNode;
+	  int u = in.nextInt();
+
+	  int v = in.nextInt();
+
+	  Set<Integer> uEdges = nodes.get(u);
+
+	  if(uEdges==null)uEdges = new HashSet<>();
+
+	  uEdges.add(v);
+
+	  nodes.put(u, uEdges);
+
+	  Set<Integer> vEdges = nodes.get(v);
+
+	  if(vEdges==null)vEdges = new HashSet<>();
+	    vEdges.add(u);
+	    nodes.put(v, vEdges);
+	  }
+	  for(int nodeid:nodes.get(1)){
+	      nodes.get(nodeid).remove(1);
+	      createEdge(rootNode, nodeid);
+	   }
+	}
+	  return rootNode;
 	}
 
 	private static void createEdge(Tree parent,int nodeid){
@@ -197,19 +191,19 @@ class Solution{
         
         boolean hasChild = nodeEdges!=null && !nodeEdges.isEmpty();
         
-		if(hasChild){
-			TreeNode node = new TreeNode(inputValues[nodeid-1],colors[nodeid-1],parent.getDepth()+1);
-            ((TreeNode)parent).addChild(node);
+	if(hasChild){
+	   TreeNode node = new TreeNode(inputValues[nodeid-1],colors[nodeid-1],parent.getDepth()+1);
+           ((TreeNode)parent).addChild(node);
             
-			for(int neighborid:nodeEdges){
-				nodes.get(neighborid).remove(nodeid);
-				createEdge(node, neighborid);
-			}
-		}else{
-			TreeLeaf leaf = new TreeLeaf(inputValues[nodeid-1],colors[nodeid-1],parent.getDepth()+1);
-			((TreeNode)parent).addChild(leaf);
-		}
+	   for(int neighborid:nodeEdges){
+		nodes.get(neighborid).remove(nodeid);
+		createEdge(node, neighborid);
+	   }
+	 }else{
+	   TreeLeaf leaf = new TreeLeaf(inputValues[nodeid-1],colors[nodeid-1],parent.getDepth()+1);
+	   ((TreeNode)parent).addChild(leaf);
 	}
+}
 
 /* ---------- */
 
@@ -228,7 +222,7 @@ class Solution{
 		int res3 = vis3.getResult();
 
 		System.out.println(res1);
-	 	System.out.println(res2);
+		System.out.println(res2);
 		System.out.println(res3);
 	}
 }
